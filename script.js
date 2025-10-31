@@ -18,7 +18,7 @@ if (textarea) textarea.focus();
 });
 
 submitWishButton.addEventListener('click', async () => {
-finalMessage.hidden = false;
+// 播放音乐
 try {
 await audio.play();
 } catch (err) {
@@ -28,6 +28,12 @@ audio.play().catch(() => {});
 document.removeEventListener('click', resume);
 };
 document.addEventListener('click', resume);
+}
+
+// 仅显示丽丽生日快乐
+const main = document.querySelector('main.container');
+if (main) {
+main.innerHTML = '<p class="final-message" style="margin:0; font-size:32px;">丽丽生日快乐</p>';
 }
 });
 })();
