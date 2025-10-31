@@ -17,14 +17,13 @@ if (textarea) textarea.focus();
 });
 
 submitWishButton.addEventListener('click', () => {
-// 先立即尝试新开标签，保持在用户手势内执行
-const newWin = window.open('wish.html', '_blank', 'noopener');
+// 构造绝对地址，兼容 GitHub Pages 子路径与自定义域根路径
+const targetUrl = new URL('wish.html', window.location.href).toString();
+const newWin = window.open(targetUrl, '_blank', 'noopener');
 if (!newWin) {
-// 被拦截则直接本页跳转
-window.location.href = 'wish.html';
+window.location.href = targetUrl;
 return;
 }
-// 非阻塞尝试播放音乐（不使用 await）
 try { audio.play().catch(() => {}); } catch (_) {}
 });
 })();
