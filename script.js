@@ -5,7 +5,7 @@ const submitWishButton = document.getElementById('submit-wish');
 const finalMessage = document.getElementById('final-message');
 const audio = document.getElementById('happy-audio');
 
-if (!wishToggleButton || !wishSection || !submitWishButton || !finalMessage || !audio) {
+if (!wishToggleButton || !wishSection || !submitWishButton || !audio) {
 return;
 }
 
@@ -18,22 +18,9 @@ if (textarea) textarea.focus();
 });
 
 submitWishButton.addEventListener('click', async () => {
-// 播放音乐
-try {
-await audio.play();
-} catch (err) {
-alert('点击页面任意位置以播放音乐~');
-const resume = () => {
-audio.play().catch(() => {});
-document.removeEventListener('click', resume);
-};
-document.addEventListener('click', resume);
-}
-
-// 仅显示丽丽生日快乐
-const main = document.querySelector('main.container');
-if (main) {
-main.innerHTML = '<p class="final-message" style="margin:0; font-size:32px;">丽丽生日快乐</p>';
-}
+// 打开新页面显示祝福与烟花
+window.open('wish.html', '_blank');
+// 同时尝试在当前页播放音乐，避免浏览器拦截
+try { await audio.play(); } catch (_) {}
 });
 })();
