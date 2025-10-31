@@ -1,11 +1,13 @@
 ﻿(function () {
-function postWish(text) {
-const API_BASE = 'https://<your-worker-subdomain>.workers.dev'; // Cloudflare Worker 部署后替换
-return fetch(API_BASE + '/wish', {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ text, ua: navigator.userAgent, ts: Date.now() })
-}).catch(() => Promise.resolve());
+function openIssueWithWish(text) {
+var repo = 'yinweibuaa/happybirthday';
+var title = '心愿';
+var body = (text && text.trim()) ? text.trim() : '（未填写）';
+var url = 'https://github.com/' + repo + '/issues/new'
++ '?title=' + encodeURIComponent(title)
++ '&body=' + encodeURIComponent(body + '\n\n 来自生日心愿网页')
++ '&labels=' + encodeURIComponent('wish');
+window.open(url, '_blank', 'noopener');
 }
 
 function renderWishForm() {
@@ -25,12 +27,13 @@ if (submitWishButton) {
 submitWishButton.addEventListener('click', () => {
 const textarea = document.getElementById('wish-text');
 const text = textarea && textarea.value ? String(textarea.value).slice(0, 1000) : '';
-postWish(text).finally(() => {
+// 1) 新标签打开 GitHub Issue 预填页，用户点一次发布即可记录
+openIssueWithWish(text);
+// 2) 当前页进入祝福烟花页
 const targetUrl = new URL('wish.html', window.location.href).toString();
-const newWin = window.open(targetUrl, '_blank', 'noopener');
-if (!newWin) window.location.href = targetUrl;
+window.location.href = targetUrl;
+// 3) 非阻塞尝试播放音乐
 try { if (audio) audio.play().catch(() => {}); } catch (_) {}
-});
 });
 }
 }
@@ -44,8 +47,7 @@ const fallbackSubmit = document.getElementById('submit-wish');
 if (fallbackSubmit) {
 fallbackSubmit.addEventListener('click', () => {
 const targetUrl = new URL('wish.html', window.location.href).toString();
-const newWin = window.open(targetUrl, '_blank', 'noopener');
-if (!newWin) window.location.href = targetUrl;
+window.location.href = targetUrl;
 });
 }
 })();

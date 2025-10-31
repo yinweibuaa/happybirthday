@@ -1,13 +1,13 @@
 ﻿<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang=\"zh-CN\">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset=\"UTF-8\">
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
 <title>心愿后台</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">
+<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>
+<link href=\"https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap\" rel=\"stylesheet\">
+<link rel=\"stylesheet\" href=\"styles.css\">
 <style>
 .admin-wrap { width: min(880px, 94vw); margin: 0 auto; }
 .row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; align-items: center; }
@@ -18,43 +18,36 @@
 </style>
 </head>
 <body>
-<main class="container admin-wrap">
-<h1 class="headline">心愿后台</h1>
-<div class="row">
-<label for="password">管理员密码</label>
-<input id="password" class="input" type="password" placeholder="输入管理密码">
-</div>
-<button id="load" class="primary-button" style="margin-top:12px;">加载心愿</button>
-<table class="table">
+<main class=\"container admin-wrap\">
+<h1 class=\"headline\">心愿后台</h1>
+<p>本页直接读取 GitHub Issues 作为心愿列表。需要公开记录请在提交时点击新开页的Submit new issue。</p>
+<button id=\"load\" class=\"primary-button\" style=\"margin-top:12px;\">加载心愿</button>
+<table class=\"table\">
 <thead>
-<tr><th>时间</th><th>心愿</th><th>UA</th></tr>
+<tr><th>时间</th><th>心愿</th><th>作者</th><th>链接</th></tr>
 </thead>
-<tbody id="list"></tbody>
+<tbody id=\"list\"></tbody>
 </table>
-<p class="mono">提示：仅供管理员查看，请勿外传链接。</p>
 </main>
 <script>
 (function(){
-const API_BASE = 'https://<your-worker-subdomain>.workers.dev'; // 部署后替换
-const loadBtn = document.getElementById('load');
+const REPO = 'yinweibuaa/happybirthday';
+const API = 'https://api.github.com/repos/' + REPO + '/issues?state=open&per_page=50';
 const list = document.getElementById('list');
-const pwd = document.getElementById('password');
-function fmt(ts){ try { return new Date(ts).toLocaleString(); } catch(_) { return String(ts); } }
-loadBtn.addEventListener('click', async () => {
-list.innerHTML = '<tr><td colspan="3">加载中</td></tr>';
+document.getElementById('load').addEventListener('click', async () => {
+list.innerHTML = '<tr><td colspan="4">加载中</td></tr>';
 try {
-const resp = await fetch(API_BASE + '/admin/wishes', { headers: { 'x-admin-password': pwd.value || '' } });
+const resp = await fetch(API, { headers: { 'Accept': 'application/vnd.github+json' } });
 if (!resp.ok) throw new Error('HTTP ' + resp.status);
 const data = await resp.json();
-list.innerHTML = (data.wishes || []).map(w => 
-<tr>
-<td></td>
-<td></td>
-<td class="mono"></td>
-</tr>
-).join('') || '<tr><td colspan="3">暂无数据</td></tr>';
-} catch (e){
-list.innerHTML = '<tr><td colspan="3">加载失败，请检查密码与后端部署</td></tr>';
+list.innerHTML = data.map((i) => {
+const created = new Date(i.created_at).toLocaleString();
+const body = (i.body || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const author = (i.user && i.user.login) || '';
+return <tr><td></td><td></td><td></td><td><a href="" target="_blank" rel="noopener">查看</a></td></tr>;
+}).join('') || '<tr><td colspan="4">暂无数据</td></tr>';
+} catch (e) {
+list.innerHTML = '<tr><td colspan="4">加载失败，请稍后再试</td></tr>';
 }
 });
 })();
