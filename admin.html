@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心愿后台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+.admin-wrap { width: min(880px, 94vw); margin: 0 auto; }
+.row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; align-items: center; }
+.input { width: 100%; padding: 10px 12px; border: 1px solid #f2b89a; border-radius: 8px; }
+.table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+.table th, .table td { padding: 10px 8px; border-bottom: 1px solid #f3d5c3; text-align: left; vertical-align: top; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: #7a5a4b; }
+</style>
+</head>
+<body>
+<main class="container admin-wrap">
+<h1 class="headline">心愿后台</h1>
+<div class="row">
+<label for="password">管理员密码</label>
+<input id="password" class="input" type="password" placeholder="输入管理密码">
+</div>
+<button id="load" class="primary-button" style="margin-top:12px;">加载心愿</button>
+<table class="table">
+<thead>
+<tr><th>时间</th><th>心愿</th><th>UA</th></tr>
+</thead>
+<tbody id="list"></tbody>
+</table>
+<p class="mono">提示：仅供管理员查看，请勿外传链接。</p>
+</main>
+<script>
+(function(){
+const API_BASE = 'https://<your-worker-subdomain>.workers.dev'; // 部署后替换
+const loadBtn = document.getElementById('load');
+const list = document.getElementById('list');
+const pwd = document.getElementById('password');
+function fmt(ts){ try { return new Date(ts).toLocaleString(); } catch(_) { return String(ts); } }
+loadBtn.addEventListener('click', async () => {
+list.innerHTML = '<tr><td colspan="3">加载中</td></tr>';
+try {
+const resp = await fetch(API_BASE + '/admin/wishes', { headers: { 'x-admin-password': pwd.value || '' } });
+if (!resp.ok) throw new Error('HTTP ' + resp.status);
+const data = await resp.json();
+list.innerHTML = (data.wishes || []).map(w => 
+<tr>
+<td></td>
+<td></td>
+<td class="mono"></td>
+</tr>
+).join('') || '<tr><td colspan="3">暂无数据</td></tr>';
+} catch (e){
+list.innerHTML = '<tr><td colspan="3">加载失败，请检查密码与后端部署</td></tr>';
+}
+});
+})();
+</script>
+</body>
+</html>
